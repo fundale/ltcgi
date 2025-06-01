@@ -141,19 +141,22 @@ namespace pi.LTCGI
         [MenuItem("Tools/LTCGI/Force Material Update")]
         public static void UpdateMaterialsMenu() => Singleton?.UpdateMaterials();
         public void UpdateMaterials() => UpdateMaterials(false);
-        public void UpdateMaterials(bool fast, LTCGI_Screen screen = null)
+        public void UpdateMaterials(bool fast, LTCGI_Screen screen = null, bool force = false)
         {
-            // don't mess with Udon emulation
-            if (EditorApplication.isPlaying)
-                return;
-            if (Lightmapping.isRunning)
-                return;
-            #if UNITY_2022_1_OR_NEWER
-                if (UnityEngine.SceneManagement.SceneManager.loadedSceneCount == 0)
-            #else
-                if (UnityEditor.SceneManagement.EditorSceneManager.loadedSceneCount == 0)
-            #endif
-                return;
+            if (!force)
+            {
+                // don't mess with Udon emulation
+                if (EditorApplication.isPlaying)
+                    return;
+                if (Lightmapping.isRunning)
+                    return;
+                #if UNITY_2022_1_OR_NEWER
+                    if (UnityEngine.SceneManagement.SceneManager.loadedSceneCount == 0)
+                #else
+                    if (UnityEditor.SceneManagement.EditorSceneManager.loadedSceneCount == 0)
+                #endif
+                    return;
+            }
 
             #if DEBUG_LOG
             Debug.Log($"LTCGI: beginning update ({(fast ? "fast" : "full")})");
