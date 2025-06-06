@@ -265,6 +265,16 @@ public class LTCGI_UdonAdapter : MonoBehaviour
         if (!this.enabled) Update();
     }
 
+    public int _GetALBand(int screen)
+    {
+        if (screen < 0) return -1;
+
+        uint flags = getFlags(screen);
+        int band = (int)((flags >> 13) & 0b11u);
+
+        return band;
+    }
+
     public void _SetVideoTexture(Texture texture)
     {
         BlurCRTInput.material.SetTexture("_MainTex", texture);
