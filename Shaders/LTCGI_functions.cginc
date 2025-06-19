@@ -390,8 +390,11 @@ void LTCGI_GetLw(uint i, ltcgi_flags flags, float3 worldPos, out float3 Lw[4], o
     float4 v2 = _Udon_LTCGI_Vertices_2_get(i);
     float4 v3 = _Udon_LTCGI_Vertices_3_get(i);
 
+#ifdef LTCGI_CYLINDER
     [branch]
-    if (cylinder) {
+    if (cylinder)
+    {
+
         // construct data according to worldPos to create aligned
         // rectangle tangent to the cylinder
         
@@ -445,8 +448,10 @@ void LTCGI_GetLw(uint i, ltcgi_flags flags, float3 worldPos, out float3 Lw[4], o
         float2 uvEnd2 = float2(1 - saturate(viewAngle + 1), 1);
         uvStart = float4(uvStart2.x, uvStart2.y, uvStart2.x, uvEnd2.y);
         uvEnd = float4(uvEnd2.x, uvStart2.y, uvEnd2.x, uvEnd2.y);
-
-    } else {
+    }
+    else
+#endif // LTCGI_CYLINDER
+    {
         // use passed in data, offset around worldPos
         Lw[0] = v0.xyz - worldPos;
         Lw[1] = v1.xyz - worldPos;

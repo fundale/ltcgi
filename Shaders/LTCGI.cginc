@@ -30,7 +30,7 @@
 #endif
 
 // Main function - this calculates the approximated model for one pixel and one light
-void LTCGI_Evaluate(ltcgi_input input, float3 worldNorm, float3 viewDir, float3x3 Minv, float roughness, const bool diffuse, out ltcgi_output output) {
+void LTCGI_Evaluate(ltcgi_input input, float3x3 Minv, float roughness, const bool diffuse, out ltcgi_output output) {
     output.input = input;
     output.color = input.rawColor; // copy for colormode static
     output.intensity = 0;
@@ -92,8 +92,6 @@ void LTCGI_Evaluate(ltcgi_input input, float3 worldNorm, float3 viewDir, float3x
     if (input.flags.colormode == LTCGI_COLORMODE_TEXTURE) {
         float3 RN;
         float2 uv = LTCGI_calculateUV(input.i, input.flags, L, input.isTri, input.uvStart, input.uvEnd, RN);
-        float planeAreaSquared = dot(RN, RN);
-        float planeDistxPlaneArea = dot(RN, L[0]);
 
         float3 sampled;
         [branch]
@@ -110,6 +108,8 @@ void LTCGI_Evaluate(ltcgi_input input, float3 worldNorm, float3 viewDir, float3x
                 LTCGI_sample(uv, 3, input.flags.texindex, 10, sampled);
             #endif
         } else {
+            float planeAreaSquared = dot(RN, RN);
+            float planeDistxPlaneArea = dot(RN, L[0]);
             float d = abs(planeDistxPlaneArea) / planeAreaSquared;
             d *= LTCGI_UV_BLUR_DISTANCE;
             d = log(d) / log(3.0);
@@ -317,7 +317,7 @@ void LTCGI_Contribution(
                 }
                 ltcgi_output diff;
                 diff.color = 0;
-                LTCGI_Evaluate(input, worldNorm, viewDir, identityBrdf, roughness, true, diff);
+                LTCGI_Evaluate(input, identityBrdf, roughness, true, diff);
                 diff.intensity *= lmd;
 
                 #ifdef LTCGI_API_V2
@@ -337,7 +337,7 @@ void LTCGI_Contribution(
             {
                 ltcgi_output spec;
                 spec.color = 0;
-                LTCGI_Evaluate(input, worldNorm, viewDir, Minv, roughness, false, spec);
+                LTCGI_Evaluate(input, Minv, roughness, false, spec);
                 spec.intensity *= spec_amp * smoothstep(0.0, LTCGI_SPECULAR_LIGHTMAP_STEP, saturate(lm - LTCGI_LIGHTMAP_CUTOFF));
 
                 #ifdef LTCGI_API_V2
