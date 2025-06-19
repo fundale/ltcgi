@@ -137,6 +137,15 @@ namespace pi.LTCGI
             }
             GUI.backgroundColor = resetCol;
 
+            EditorGUILayout.Space();
+
+            var allowStaticBatchingProp = serializedObject.FindProperty("allowStaticBatching");
+            EditorGUILayout.PropertyField(allowStaticBatchingProp, new GUIContent("Allow Static Batching (EXPERIMENTAL)", "Don't disable static batching for LTCGI-enabled objects. This may lead to desynced lightmap UVs at runtime."));
+            if (allowStaticBatchingProp.boolValue)
+            {
+                EditorGUILayout.HelpBox("Static Batching Support is EXPERIMENTAL. Test in playmode. Please report any issues with this option active on Discord.\nNOTE: This will *not* enable static batching on objects previously baked with LTCGI, you have to manually check the 'Static' checkbox again before running a bake.", MessageType.Warning);
+            }
+
             EditorGUILayout.Space(); EditorGUILayout.Space();
 
             LTCGI_Controller.DrawAutoSetupEditor(LTCGI_Controller.Singleton);

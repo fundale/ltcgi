@@ -65,7 +65,7 @@ namespace pi.LTCGI
             Color.blue,
         };
 
-        public void Update()
+        private void Update()
         {
             // don't mess with Udon emulation
             if (EditorApplication.isPlaying)
@@ -85,6 +85,12 @@ namespace pi.LTCGI
                 LTCGI_Controller.Singleton.UpdateMaterials(true, this);
                 update = false;
             }
+        }
+
+        private void Awake()
+        {
+            // register on create
+            LTCGI_Controller.Singleton.UpdateMaterials(false);
         }
 
         void OnDrawGizmos()

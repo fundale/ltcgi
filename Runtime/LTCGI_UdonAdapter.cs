@@ -20,9 +20,6 @@ public class LTCGI_UdonAdapter : UdonSharpBehaviour
 public class LTCGI_UdonAdapter : MonoBehaviour
 #endif
 {
-    // perhaps fixes some lightmap issues with static batching?
-    public bool DEBUG_ReverseUnityLightmapST = false;
-
     [Header("Internal Data (auto-generated, do not edit!)")]
     public Renderer[] _Renderers;
     public Texture2D _LTCGI_DefaultLightmap;
@@ -55,14 +52,11 @@ public class LTCGI_UdonAdapter : MonoBehaviour
     private int prop_Udon_LTCGI_Vertices_2;
     private int prop_Udon_LTCGI_Vertices_3;
 
+    private readonly Vector4 defaultLMST = new Vector4(1, 1, 0, 0);
+
     void Start()
     {
         Debug.Log("LTCGI adapter start");
-
-        if (DEBUG_ReverseUnityLightmapST)
-        {
-            Debug.LogWarning("WARNING: LTCGI DEBUG_ReverseUnityLightmapST is active! This is probably not what you want!");
-        }
 
         if (_LTCGI_ScreenCount == 0)
         {
@@ -155,16 +149,17 @@ public class LTCGI_UdonAdapter : MonoBehaviour
             if (_LTCGI_Lightmaps[i] != null)
                 block.SetTexture("_Udon_LTCGI_Lightmap", _LTCGI_Lightmaps[i]);
             block.SetVector("_Udon_LTCGI_LightmapMult", _LTCGI_LightmapMult);
-            var lmst = _LTCGI_LightmapST[i];
-            if (DEBUG_ReverseUnityLightmapST)
+
+            var mf = r.GetComponent<MeshFilter>();
+            if (mf != null && mf.sharedMesh != null && mf.sharedMesh.name.StartsWith("Combined Mesh"))
             {
-                // workaround?
-                lmst.x /= r.lightmapScaleOffset.x;
-                lmst.y /= r.lightmapScaleOffset.y;
-                lmst.z -= r.lightmapScaleOffset.z;
-                lmst.w -= r.lightmapScaleOffset.w;
+                block.SetVector("_Udon_LTCGI_LightmapST", defaultLMST);
             }
-            block.SetVector("_Udon_LTCGI_LightmapST", lmst);
+            else
+            {
+                var lmst = _LTCGI_LightmapST[i];
+                block.SetVector("_Udon_LTCGI_LightmapST", lmst);
+            }
 
             r.SetPropertyBlock(block);
         }

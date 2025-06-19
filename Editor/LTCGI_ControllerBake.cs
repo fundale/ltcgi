@@ -35,6 +35,7 @@ namespace pi.LTCGI
 
         [SerializeField] private bool followupWithRealBake;
         [SerializeField] private bool followupBakery;
+        [SerializeField] private bool allowStaticBatching = false;
 
         public bool HasLightmapData() => _LTCGI_Lightmaps != null && _LTCGI_Lightmaps.Length > 0;
         public void ClearLightmapData()
@@ -399,6 +400,9 @@ namespace pi.LTCGI
                     rkey.Add(r);
                     rval.Add(r.lightmapScaleOffset);
                     rival.Add(r.lightmapIndex);
+
+                    if (allowStaticBatching)
+                        continue;
 
                     foreach (var m in r.sharedMaterials)
                     {
