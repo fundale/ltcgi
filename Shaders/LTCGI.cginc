@@ -232,16 +232,13 @@ void LTCGI_Contribution(
     #endif
 
     bool noLm = false;
-    #ifdef LTCGI_LTC_DIFFUSE_FALLBACK
     #ifndef LTCGI_ALWAYS_LTC_DIFFUSE
-    #ifndef SHADER_TARGET_SURFACE_ANALYSIS
-        float2 lmSize;
-        _Udon_LTCGI_Lightmap.GetDimensions(lmSize.x, lmSize.y);
-        noLm = lmSize.x == 1;
-    #endif
-    #endif
-    #endif
-    #ifdef LTCGI_ALWAYS_LTC_DIFFUSE
+        #ifndef SHADER_TARGET_SURFACE_ANALYSIS
+            float2 lmSize;
+            _Udon_LTCGI_Lightmap.GetDimensions(lmSize.x, lmSize.y);
+            noLm = lmSize.x == 1;
+        #endif
+    #else // LTCGI_ALWAYS_LTC_DIFFUSE
         noLm = true;
     #endif
 
