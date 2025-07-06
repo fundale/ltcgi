@@ -100,6 +100,7 @@ namespace pi.LTCGI
             }
             
             MigratoryBirdsDontMigrateAsMuchAsWeDoButThisFunctionWillTakeCareOfItNonetheless();
+            UpdateMaterials(false);
         }
 
         [InitializeOnLoadMethod]

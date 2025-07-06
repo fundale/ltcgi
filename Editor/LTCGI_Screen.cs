@@ -87,10 +87,18 @@ namespace pi.LTCGI
             }
         }
 
-        private void Awake()
+        private void OnEnable()
         {
             // register on create
-            LTCGI_Controller.Singleton.UpdateMaterials(false);
+            if (LTCGI_Controller.Singleton != null)
+                LTCGI_Controller.Singleton.UpdateMaterials(false);
+        }
+
+        private void OnDisable()
+        {
+            // unregister
+            if (LTCGI_Controller.Singleton != null)
+                LTCGI_Controller.Singleton.UpdateMaterials(false);
         }
 
         void OnDrawGizmos()
