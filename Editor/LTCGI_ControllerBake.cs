@@ -37,6 +37,9 @@ namespace pi.LTCGI
         [SerializeField] private bool followupBakery;
         [SerializeField] private bool allowStaticBatching = false;
 
+        public static event Action OnLTCGIShadowmapBakeComplete;
+        public static event Action OnLTCGIShadowmapClearData;
+
         public bool HasLightmapData() => _LTCGI_Lightmaps != null && _LTCGI_Lightmaps.Length > 0;
         public void ClearLightmapData()
         {
@@ -44,6 +47,8 @@ namespace pi.LTCGI
             _LTCGI_LightmapData_key = null;
             _LTCGI_LightmapOffsets_val = null;
             _LTCGI_LightmapIndex_val = null;
+
+            OnLTCGIShadowmapClearData?.Invoke();
         }
 
         [MenuItem("Tools/LTCGI/Bake Shadowmap")]
@@ -180,7 +185,7 @@ namespace pi.LTCGI
                           new Color(0, 0, 0, 1)));
                 mat.SetColor("_EmissionColor", col);
                 mat.EnableKeyword("_EMISSION");
-                mat.doubleSidedGI = true; // scr.DoubleSided ??
+                mat.doubleSidedGI = scr.DoubleSided;
                 mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
 
                 Action<Renderer> handleRenderer = (rend) => {
@@ -423,7 +428,7 @@ namespace pi.LTCGI
             _LTCGI_LightmapOffsets_val = rval.ToArray();
             _LTCGI_LightmapIndex_val = rival.ToArray();
 
-            EditorUtility.DisplayProgressBar("Finishing LTCGI bake", "Resetting configuration", 1.0f);
+            EditorUtility.DisplayProgressBar("Finishing LTCGI bake", "Resetting configuration", 0.9f);
             bakeInProgress = false;
             ResetConfiguration();
 
@@ -441,6 +446,9 @@ namespace pi.LTCGI
                 data.shadowMask = prevLightmaps3[i];
                 LightmapSettings.lightmaps[i] = data;
             }*/
+
+            EditorUtility.DisplayProgressBar("Finishing LTCGI bake", "Calling external event handlers", 1.0f);
+            OnLTCGIShadowmapBakeComplete?.Invoke();
 
             EditorUtility.ClearProgressBar();
             LTCGI_Controller.Singleton.UpdateMaterials();
